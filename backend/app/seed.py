@@ -1,4 +1,5 @@
 from app.db import connect
+from app.modules import exposure
 
 def init_db():
     c = connect()
@@ -19,6 +20,11 @@ def init_db():
             ("纱帘2.8m",2.8,0.08,0.12,"clean",""),
             ("脏数据-零门幅",0.0,0.1,0.1,"dirty",""),
         ])
-        c.execute("INSERT INTO settings(key,value) VALUES ('default_fullness','2.0')")
-        c.commit()
+    # 默认设置对老库也要补齐（不覆盖已有值）
+    c.executemany("INSERT OR IGNORE INTO settings(key,value) VALUES (?,?)",[
+        ("default_fullness","2.0"),
+        (exposure.EXTRA_SETTING_KEY, str(exposure.DEFAULT_EXTRA_METERS)),
+        (exposure.ENABLED_SETTING_KEY, "1" if exposure.DEFAULT_ENABLED else "0"),
+    ])
+    c.commit()
     c.close()
