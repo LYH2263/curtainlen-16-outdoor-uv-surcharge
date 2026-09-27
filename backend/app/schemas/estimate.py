@@ -5,3 +5,4 @@ class EstimateRequest(BaseModel):
     fabric_id: int
     save: bool = False
     note: str = ""
+    exposure_type: str = "indoor"

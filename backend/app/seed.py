@@ -1,5 +1,11 @@
 from app.db import connect
 
+DEFAULT_SETTINGS = {
+    "default_fullness": "2.0",
+    "exposure_outdoor_uv_enabled": "1",
+    "exposure_outdoor_uv_extra_m": "0.3",
+}
+
 def init_db():
     c = connect()
     c.executescript("""
@@ -19,6 +25,7 @@ def init_db():
             ("纱帘2.8m",2.8,0.08,0.12,"clean",""),
             ("脏数据-零门幅",0.0,0.1,0.1,"dirty",""),
         ])
-        c.execute("INSERT INTO settings(key,value) VALUES ('default_fullness','2.0')")
-        c.commit()
+    for k, v in DEFAULT_SETTINGS.items():
+        c.execute("INSERT OR IGNORE INTO settings(key,value) VALUES (?,?)", (k, v))
+    c.commit()
     c.close()
